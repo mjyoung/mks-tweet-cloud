@@ -15,7 +15,7 @@ configure :development do
 end
 
 configure :production do
-  DataMapper.setup(:default, ENV['HEROKU_POSTGRESQL_COPPER_URL'])
+  DataMapper.setup(:default, ENV['HEROKU_POSTGRESQL_ROSE_URL'])
 end
 
 class LastUpdated
