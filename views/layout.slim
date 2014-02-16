@@ -1,0 +1,90 @@
+doctype html
+html
+  head
+    meta charset="utf-8"
+    title MakerSquare Spring 2014 Tweet Cloud
+    link rel="stylesheet" media="screen, projection" href="css/styles.css"
+    /[if lt IE 9]
+      script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"
+    link href="css/jqcloud.css" rel="stylesheet" type="text/css"
+    script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js" type="text/javascript"
+    script src="js/jqcloud-1.0.4.js" type="text/javascript"
+
+    javascript:
+      // requires the {{ ... }} to correctly conver to unescaped json
+      var js_word_count = #{{ @word_count_hash.to_json }}
+
+
+      var js_word_array = [];
+      for (var key in js_word_count){
+        var temp = {};
+        temp['text'] = key;
+        temp['weight'] = js_word_count[key];
+        js_word_array.push(temp)
+      }
+
+      var word_list = new Array(
+        {text: "Lorem", weight: 13, link: "https://github.com/lucaong/jQCloud"},
+        {text: "Ipsum", weight: 10.5, link: "http://jquery.com/"},
+        {text: "Dolor", weight: 9.4},
+        {text: "Sit", weight: 8},
+        {text: "Amet", weight: 6.2},
+        {text: "Consectetur", weight: 5},
+        {text: "Adipiscing", weight: 5},
+        {text: "Elit", weight: 5},
+        {text: "Nam et", weight: 5},
+        {text: "Leo", weight: 4},
+        {text: "Sapien", weight: 4, link: "http://www.lucaongaro.eu/"},
+        {text: "Pellentesque", weight: 3},
+        {text: "habitant", weight: 3},
+        {text: "morbi", weight: 3},
+        {text: "tristisque", weight: 3},
+        {text: "senectus", weight: 3},
+        {text: "et netus", weight: 3},
+        {text: "et malesuada", weight: 3},
+        {text: "fames", weight: 2},
+        {text: "ac turpis", weight: 2},
+        {text: "egestas", weight: 2},
+        {text: "Aenean", weight: 2},
+        {text: "vestibulum", weight: 2},
+        {text: "elit", weight: 2},
+        {text: "sit amet", weight: 2},
+        {text: "metus", weight: 2},
+        {text: "adipiscing", weight: 2},
+        {text: "ut ultrices", weight: 2},
+        {text: "justo", weight: 1},
+        {text: "dictum", weight: 1},
+        {text: "Ut et leo", weight: 1},
+        {text: "metus", weight: 1},
+        {text: "at molestie", weight: 1},
+        {text: "purus", weight: 1},
+        {text: "Curabitur", weight: 1},
+        {text: "diam", weight: 1},
+        {text: "dui", weight: 1},
+        {text: "ullamcorper", weight: 1},
+        {text: "id vuluptate ut", weight: 1},
+        {text: "mattis", weight: 1},
+        {text: "et nulla", weight: 1},
+        {text: "Sed", weight: 1}
+      );
+
+      console.log(word_list);
+      console.log(js_word_count);
+      console.log(js_word_array);
+
+      $(document).ready(function() {
+        $("#wordcloud").jQCloud(js_word_array);
+      });
+
+
+  body
+    h2 MakerSquare Spring-2014 Cohort Tweet Cloud
+    ul
+      | Technologies used
+      li Ruby - Sinatra framework with Slim template engine
+      li sqlite3 gem for dev db, postgres gem for production db
+      li DataMapper gem to create and read entries in the db
+      li JavaScript - jQuery, jQCloud
+      li twitter gem to interact with Twitter API
+
+    == yield
