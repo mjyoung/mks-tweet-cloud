@@ -90,12 +90,14 @@ html
     h2 MakerSquare Spring-2014 Cohort Tweet Cloud
     .row
       a href="https://github.com/mjyoung/mks-tweet-cloud" Github Repo
-      br /
+      br/
       | DB is set to only update a max of one time per 15 minutes to prevent exceeding Twitter rate limit
       br/
       | DB last updated: #{@last_updated}
       br/
       | Current time: #{Time.now.utc}
+      br/
+      | Last tweet id: #{@last_tweet_id}
     ul
       | Technologies used
       li Ruby - Sinatra framework with Slim template engine
