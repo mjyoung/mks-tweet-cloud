@@ -82,8 +82,38 @@ class TwitterFetcher < Sinatra::Base
 
     @text_array = []
 
-    @list_tweets = client.list_timeline(105076815, options = {:count => 11})
-    @list_tweets.each do |tweet|
+
+    if LastUpdated.count > 0  # If DB is not empty
+      # The time is stored into the DB as DateTime. Need to parse to Time
+      # in order to run 15-minute check in Ruby
+      @last_updated = Time.parse(LastUpdated.last[:last_updated].to_s).utc
+
+      @time_check = @last_updated + (15 * 60)
+
+      @last_tweet_id = LastUpdated.last[:last_tweet_id]
+
+      if @time_check < Time.now.utc
+        @list_tweets = client.list_timeline(105076815, options = {:since_id => @last_tweet_id, :count => 200})
+        @list_tweets.each do |tweet|
+        tweet_id   = tweet[:id]
+        tweet_date = tweet[:created_at]
+        user_name  = tweet[:user][:user_name]
+        user_id    = tweet[:user][:id]
+        full_text  = tweet[:full_text]
+        Tweet.create(:tweet_id => tweet_id,
+                      :tweet_date => tweet_date,
+                      :user_name => user_name,
+                      :user_id => user_id,
+                      :full_text => full_text)
+        end
+        LastUpdated.create(:last_updated => Time.now.utc,
+                           :last_tweet_id => @list_tweets.first[:id])
+
+      end
+
+    else # If DB is empty
+      @list_tweets = client.list_timeline(105076815, options = {:count => 200})
+      @list_tweets.each do |tweet|
       tweet_id   = tweet[:id]
       tweet_date = tweet[:created_at]
       user_name  = tweet[:user][:user_name]
@@ -94,9 +124,10 @@ class TwitterFetcher < Sinatra::Base
                     :user_name => user_name,
                     :user_id => user_id,
                     :full_text => full_text)
+      end
+      LastUpdated.create(:last_updated => Time.now.utc,
+                         :last_tweet_id => @list_tweets.first[:id])
     end
-    LastUpdated.create(:last_updated => Time.now.utc,
-                       :last_tweet_id => @list_tweets.first[:id])
 
     Tweet.all(:fields => [:full_text]).each do |tweet|
       @text_array << tweet[:full_text]

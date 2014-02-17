@@ -79,6 +79,12 @@ html
 
   body
     h2 MakerSquare Spring-2014 Cohort Tweet Cloud
+    .row
+      | DB is set to only update a max of one time per 15 minutes to prevent exceeding Twitter rate limit
+      br/
+      | DB last updated: #{@last_updated}
+      br/
+      | Current time: #{Time.now.utc}
     ul
       | Technologies used
       li Ruby - Sinatra framework with Slim template engine
