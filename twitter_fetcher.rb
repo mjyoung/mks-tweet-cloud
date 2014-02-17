@@ -107,7 +107,7 @@ class TwitterFetcher < Sinatra::Base
                       :full_text => full_text)
         end
 
-        if @list_tweets
+        if @list_tweets.length > 0
           LastUpdated.create(:last_updated => Time.now.utc,
                              :last_tweet_id => @list_tweets.last[:id])
         end
