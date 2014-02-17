@@ -11,11 +11,25 @@ require 'slim'
 
 configure :development do
   DataMapper.setup(:default, ENV['Database_URL'] || "sqlite3://#{Dir.pwd}/development.db")
+
+  # Load Twitter consumer and access keys and set global variables
   load 'twitter_credentials.rb'
 end
 
 configure :production do
   DataMapper.setup(:default, ENV['HEROKU_POSTGRESQL_ROSE_URL'])
+  # To create the tables within Heroku, you will want to run in terminal:
+  # heroku run console
+  # $2.0.0-p0 :001>require './main.rb'
+  # $2.0.0-p0 :002>DataMapper.auto_migrate!
+  # May or may not also need to run:
+  # $2.0.0-p0 :003>LastUpdated.auto_migrate!
+  # $2.0.0-p0 :004>Tweet.auto_migrate!
+
+  # Use Heroku's keys that I set within terminal console:
+  # heroku config:set TWITTER_CONSUMER_KEY="abc123"
+  # check all config settings with:  heroku config
+  # If Heroku app doesn't run correctly, check logs with:  heroku logs
   $twitter_consumer_key = ENV['TWITTER_CONSUMER_KEY']
   $twitter_consumer_secret = ENV['TWITTER_CONSUMER_SECRET']
   $twitter_access_token = ENV['TWITTER_ACCESS_TOKEN']
