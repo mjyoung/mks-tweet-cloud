@@ -6,7 +6,7 @@ require 'twitter'
 require 'data_mapper'
 require 'slim'
 
-$CLOUD_BLACKLIST = %w(- @ @makersquare a am an and are at be do for from have i if i'm in is it it's its just like me my of on our out that the to rt than this was we when with you your)
+$CLOUD_BLACKLIST = %w(- @ @makersquare a am an and are at be do for from have i if i'm in is it it's its just like me my of on our out that the to rt so than this was we when with you your)
 
 configure :development do
   DataMapper.setup(:default, ENV['Database_URL'] || "sqlite3://#{Dir.pwd}/development.db")
@@ -91,7 +91,7 @@ class TwitterFetcher < Sinatra::Base
       @last_tweet_id = LastUpdated.last[:last_tweet_id]
 
       if @time_check < Time.now.utc
-        @list_tweets = client.list_timeline(105076815, options = {:since_id => @last_tweet_id, :count => 200})
+        @list_tweets = client.list_timeline(105076815, options = {:since_id => @last_tweet_id, :count => 200}).reverse
         @list_tweets.each do |tweet|
         tweet_id   = tweet[:id]
         tweet_date = tweet[:created_at]
@@ -110,7 +110,7 @@ class TwitterFetcher < Sinatra::Base
       end
 
     else # If DB is empty
-      @list_tweets = client.list_timeline(105076815, options = {:count => 200})
+      @list_tweets = client.list_timeline(105076815, options = {:count => 200}).reverse
       @list_tweets.each do |tweet|
       tweet_id   = tweet[:id]
       tweet_date = tweet[:created_at]
@@ -142,7 +142,23 @@ class TwitterFetcher < Sinatra::Base
 
   end
 
-  get '/today' do
+  get '/last24' do
+
+    @text_array = []
+
+    Tweet.all(:tweet_date.gte => Time.now.utc-60*60*24).each do |tweet|
+      @text_array << tweet[:full_text]
+    end
+
+    # The below 3 lines creates a hash of words and counts
+    @word_array = @text_array.join(' ').split
+    @word_count_hash = Hash.new(0)
+    @word_array.each do |word|
+      @word_count_hash[word] += 1 unless $CLOUD_BLACKLIST.include?(word.downcase)
+    end
+
+    slim :today
+
   end
 
   get '/response.json' do
