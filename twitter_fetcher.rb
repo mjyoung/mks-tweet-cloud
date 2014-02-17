@@ -6,8 +6,7 @@ require 'twitter'
 require 'data_mapper'
 require 'slim'
 
-# require_relative '00-twitter-credentials'
-
+$CLOUD_BLACKLIST = %w(- @ @makersquare a am an and are at be do for from have i if i'm in is it it's its just like me my of on our out that the to rt than this was we when with you your)
 
 configure :development do
   DataMapper.setup(:default, ENV['Database_URL'] || "sqlite3://#{Dir.pwd}/development.db")
@@ -82,7 +81,6 @@ class TwitterFetcher < Sinatra::Base
 
     @text_array = []
 
-
     if LastUpdated.count > 0  # If DB is not empty
       # The time is stored into the DB as DateTime. Need to parse to Time
       # in order to run 15-minute check in Ruby
@@ -136,10 +134,15 @@ class TwitterFetcher < Sinatra::Base
     # The below 3 lines creates a hash of words and counts
     @word_array = @text_array.join(' ').split
     @word_count_hash = Hash.new(0)
-    @word_array.each { |word| @word_count_hash[word] += 1 }
+    @word_array.each do |word|
+      @word_count_hash[word] += 1 unless $CLOUD_BLACKLIST.include?(word.downcase)
+   end
 
     slim :index
 
+  end
+
+  get '/today' do
   end
 
   get '/response.json' do
