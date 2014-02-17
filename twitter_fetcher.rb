@@ -6,7 +6,7 @@ require 'twitter'
 require 'data_mapper'
 require 'slim'
 
-$CLOUD_BLACKLIST = %w(- @ @makersquare a am an and are at be do for from have i if i'm in is it it's its just like me my of on our out that the to rt so than this was we when with you your)
+$CLOUD_BLACKLIST = %w(- @ @makersquare a am an and are at be do for from have i if i'm in is it it's its just like makersquare me my of on our out that the to rt so than this was we when with you your)
 
 configure :development do
   DataMapper.setup(:default, ENV['Database_URL'] || "sqlite3://#{Dir.pwd}/development.db")
@@ -142,6 +142,7 @@ class TwitterFetcher < Sinatra::Base
     @word_array = @text_array.join(' ').split
     @word_count_hash = Hash.new(0)
     @word_array.each do |word|
+      word.gsub!(/[^[:alnum:]]/,'') # Eliminate punctuation around word
       @word_count_hash[word] += 1 unless $CLOUD_BLACKLIST.include?(word.downcase)
     end
 
@@ -170,10 +171,11 @@ class TwitterFetcher < Sinatra::Base
     @word_array = @text_array.join(' ').split
     @word_count_hash = Hash.new(0)
     @word_array.each do |word|
+      word.gsub!(/[^[:alnum:]]/,'') # Eliminate punctuation around word
       @word_count_hash[word] += 1 unless $CLOUD_BLACKLIST.include?(word.downcase)
     end
 
-    slim :today
+    slim :last24
 
   end
 
