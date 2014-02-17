@@ -6,16 +6,20 @@ require 'twitter'
 require 'data_mapper'
 require 'slim'
 
-# require '00-twitter-credentials'
 # require_relative '00-twitter-credentials'
 
 
 configure :development do
   DataMapper.setup(:default, ENV['Database_URL'] || "sqlite3://#{Dir.pwd}/development.db")
+  load 'twitter_credentials.rb'
 end
 
 configure :production do
   DataMapper.setup(:default, ENV['HEROKU_POSTGRESQL_ROSE_URL'])
+  $twitter_consumer_key = ENV['TWITTER_CONSUMER_KEY']
+  $twitter_consumer_secret = ENV['TWITTER_CONSUMER_SECRET']
+  $twitter_access_token = ENV['TWITTER_ACCESS_TOKEN']
+  $twitter_access_token_secret = ENV['TWITTER_ACCESS_TOKEN_SECRET']
 end
 
 class LastUpdated
