@@ -80,6 +80,8 @@ class TwitterFetcher < Sinatra::Base
     # end
 
     @text_array = []
+    @username_array = []
+    @date_array = []
 
     if LastUpdated.count > 0  # If DB is not empty
       # The time is stored into the DB as DateTime. Need to parse to Time
@@ -105,7 +107,7 @@ class TwitterFetcher < Sinatra::Base
                       :full_text => full_text)
         end
         LastUpdated.create(:last_updated => Time.now.utc,
-                           :last_tweet_id => @list_tweets.first[:id])
+                           :last_tweet_id => @list_tweets.last[:id])
 
       end
 
@@ -124,11 +126,13 @@ class TwitterFetcher < Sinatra::Base
                     :full_text => full_text)
       end
       LastUpdated.create(:last_updated => Time.now.utc,
-                         :last_tweet_id => @list_tweets.first[:id])
+                         :last_tweet_id => @list_tweets.last[:id])
     end
 
-    Tweet.all(:fields => [:full_text]).each do |tweet|
+    Tweet.all(:fields => [:full_text, :user_name, :tweet_date]).each do |tweet|
       @text_array << tweet[:full_text]
+      @username_array << tweet[:user_name]
+      @date_array << tweet[:tweet_date]
     end
 
     # The below 3 lines creates a hash of words and counts
@@ -136,7 +140,16 @@ class TwitterFetcher < Sinatra::Base
     @word_count_hash = Hash.new(0)
     @word_array.each do |word|
       @word_count_hash[word] += 1 unless $CLOUD_BLACKLIST.include?(word.downcase)
-   end
+    end
+
+    @username_hash = Hash.new(0)
+    @username_array.each do |username|
+      @username_hash[username] += 1
+    end
+
+    @username_top3 = []
+    @username_top3 = @username_hash.sort_by { |key, value| value }.reverse
+    @username_top3 = @username_top3[0..2]
 
     slim :index
 

@@ -1,1 +1,7 @@
 #wordcloud style="width: 800px; height: 400px;"
+
+.row
+  ol
+    | Top 3 Posters All-Time:
+    - @username_top3.each do |user|
+      li User: #{user[0]}, Count: #{user[1]}
